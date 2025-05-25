@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: java-rabbitmq
+  rabbitmq:
+    host: 192.168.96.145
+    port: 5672
+    virtual-host: /steerHost
+    username: admin
+    password: admin
