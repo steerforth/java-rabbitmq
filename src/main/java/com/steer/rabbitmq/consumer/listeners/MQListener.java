@@ -23,4 +23,14 @@ public class MQListener {
     public void listenerWorkQueue2(String msg){
         LOG.error("work.queue >>>>>>> receive msg:{}",msg);
     }
+
+    @RabbitListener(queues = "fanout.queue1")
+    public void listenerFanoutQueue1(String msg){
+        LOG.info("fanout.queue1 receive msg:{}",msg);
+    }
+
+    @RabbitListener(queues = "fanout.queue2")
+    public void listenerFanoutQueue2(String msg){
+        LOG.error("fanout.queue2 >>>>>>> receive msg:{}",msg);
+    }
 }
