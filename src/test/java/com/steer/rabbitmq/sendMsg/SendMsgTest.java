@@ -10,6 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class SendMsgTest {
@@ -45,5 +48,45 @@ public class SendMsgTest {
         String exchange = "steer.fanout";
         String msg = "hello world!";
         template.convertAndSend(exchange,null,msg);
+    }
+
+    @Test
+    public void testDirectExchange(){
+        String exchange = "steer.direct";
+        String msg = "hello world!";
+        template.convertAndSend(exchange,"red",msg);
+    }
+
+    @Test
+    public void testDirectExchange2(){
+        String exchange = "steer.direct";
+        String msg = "hello world!";
+        template.convertAndSend(exchange,"blue",msg);
+    }
+
+    @Test
+    public void testTopicExchange(){
+        String exchange = "steer.topic";
+        String msg = "hello world!";
+        template.convertAndSend(exchange,"china.news",msg);
+    }
+
+    @Test
+    public void testTopicExchange2(){
+        String exchange = "steer.topic";
+        String msg = "hello world!";
+        template.convertAndSend(exchange,"english.news",msg);
+    }
+
+    /**
+     * 需要配置Jackson2JsonMessageConverter
+     */
+    @Test
+    public void testSendObject(){
+        String exchange = "simple.queue";
+        Map<String,String> obj = new HashMap<>();
+        obj.put("name","张三");
+        obj.put("age","12");
+        template.convertAndSend(exchange,obj);
     }
 }
