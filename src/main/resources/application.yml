@@ -2,8 +2,15 @@ spring:
   application:
     name: java-rabbitmq
   rabbitmq:
-    host: 192.168.96.145
+    host: 192.168.96.146
     port: 5672
     virtual-host: /steerHost
     username: admin
     password: admin
+    connection-timeout: 2s
+    template:
+      retry:
+        enabled: true
+        multiplier: 2
+    publisher-confirm-type: correlated #none不确认；simple同步阻塞等待MQ回执；correlated异步回调返回
+    publisher-returns: true #开启

@@ -5,13 +5,18 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.amqp.core.Correlation;
+import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -89,4 +94,41 @@ public class SendMsgTest {
         obj.put("age","12");
         template.convertAndSend(exchange,obj);
     }
+
+    /**
+     * 消息确认机制
+     * @throws ExecutionException
+     * @throws InterruptedException
+     */
+    @Test
+    public void testConfirm() throws ExecutionException, InterruptedException, IOException {
+        String exchange = "steer.direct";
+        String msg = "hello world!";
+
+        CorrelationData cd = new CorrelationData(UUID.randomUUID().toString());
+
+        template.convertAndSend(exchange,"red",msg,cd);
+        CorrelationData.Confirm confirm = cd.getFuture().get();
+        if (confirm.isAck()){
+            LOG.info("发送成功，收到ack");
+        }else {
+            LOG.error("发送失败，未收到ack");
+        }
+
+        System.in.read();
+    }
+
+    @Test
+    public void test_error_routingKey_then_return_callback() throws ExecutionException, InterruptedException, IOException {
+        String exchange = "steer.direct";
+        String msg = "hello world!";
+
+        CorrelationData cd = new CorrelationData(UUID.randomUUID().toString());
+        //不存在的routingKey，会调用ReturnsCallback
+        template.convertAndSend(exchange,"blue22",msg,cd);
+
+        System.in.read();
+    }
+
+
 }
