@@ -6,6 +6,9 @@ import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Correlation;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.MessageBuilder;
+import org.springframework.amqp.core.MessageDeliveryMode;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +16,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -130,5 +134,34 @@ public class SendMsgTest {
         System.in.read();
     }
 
+    /**
+     * pageout时会阻塞；发送效率很慢
+     * 测试时记得关闭配置publisher-confirm-type 和 publisher-returns
+     *
+     */
+    @Test
+    public void testPageOut(){
+        Message message = MessageBuilder.withBody("hello world".getBytes(StandardCharsets.UTF_8)).setDeliveryMode(MessageDeliveryMode.NON_PERSISTENT).build();
+        for (int i = 0; i < 1000000; i++) {
+            //注意观察rabbitmq admin
+            template.convertAndSend("simple.queue",message);
+        }
+    }
 
+    /**
+     * TODO
+     * acknowledge-mode: none 不生效；不会ack，而是nack
+     */
+    @Test
+    public void testAckMode(){
+        String msg = "hello world";
+        template.convertAndSend("simple.queue",msg);
+    }
+
+    @Test
+    public void testDirectErrorExchange(){
+        String exchange = "error.direct";
+        String msg = "hello world!";
+        template.convertAndSend(exchange,"errorkey",msg);
+    }
 }

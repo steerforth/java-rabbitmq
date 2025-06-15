@@ -8,9 +8,17 @@ spring:
     username: admin
     password: admin
     connection-timeout: 2s
-    template:
-      retry:
-        enabled: true
-        multiplier: 2
-    publisher-confirm-type: correlated #none不确认；simple同步阻塞等待MQ回执；correlated异步回调返回
-    publisher-returns: true #开启
+#    template:
+#      retry:
+#        enabled: true
+#        multiplier: 2
+    #publisher-confirm-type: none #none不确认；simple同步阻塞等待MQ回执；correlated异步回调返回
+    #publisher-returns: true #开启
+    listener:
+      simple:
+        prefetch: 1
+        acknowledge-mode: auto
+        retry:
+          enabled: true
+          multiplier: 1
+          max-attempts: 3

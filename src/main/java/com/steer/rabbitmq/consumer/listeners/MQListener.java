@@ -13,10 +13,11 @@ import org.springframework.stereotype.Component;
 public class MQListener {
     private static final Logger LOG = LoggerFactory.getLogger(MQListener.class);
 
-//    @RabbitListener(queues = "simple.queue")
-//    public void listenerSimpleQueue(String msg){
-//        LOG.info("simple.queue receive msg:{}",msg);
-//    }
+    @RabbitListener(queues = "simple.queue")
+    public void listenerSimpleQueue(String msg){
+        LOG.info("simple.queue receive msg:{}",msg);
+        throw new RuntimeException("a new exception!!!");
+    }
 
     @RabbitListener(queues = "work.queue")
     public void listenerWorkQueue1(String msg){
@@ -86,5 +87,28 @@ public class MQListener {
     ))
     public void listenerTopicQueue2(String msg){
         LOG.error("topic.queue2 >>>>>>> receive msg:{}",msg);
+    }
+
+    /**
+     * acknowledge-mode:
+     * none:不处理.即消费后即刻ack，消息会从MQ中删除
+     * manual:自己调用api去reject或ack
+     * auto:如果业务异常，返回nack
+     *      如果消息处理或校验异常，返回reject
+     *
+     *      TODO 不起效果
+     * @param msg
+     */
+    @RabbitListener(queues = "ack.queue")
+    public void listenerAckQueue(String msg){
+        LOG.info("ack.queue receive msg:{}",msg);
+        throw new RuntimeException("a new exception!!!");
+    }
+
+
+    @RabbitListener(queues = "error.queue")
+    public void listenerErrorQueue(String msg){
+        LOG.info("error.queue receive msg:{}",msg);
+        throw new RuntimeException("i am error!!!");
     }
 }
